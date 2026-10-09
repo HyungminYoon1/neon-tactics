@@ -15,7 +15,13 @@ The user selected this game and requested substantial challenge, fun and real-ga
 
 ## Acceptance
 
+Approved extension: retain the 12 v1 missions and add four v2 objective missions (escort, escape, hold and constrained fixed master). Versioned bounded local practice/tutorial replay, independent/assisted best records, restore/clear and a minimal gallery summary are allowed. First visit offers a playable tutorial or immediate master practice. Fit/zoom/pan and contextual mobile controls are required. A separate highest-challenge ranked adapter may capture actual actions; provisioning, endpoints, SDK and public ranking remain main's responsibility. No automatic network calls or clock-based scoring. Browser E2E/screenshots are performed by main, with local model/static evidence reported separately.
+
 - Complete playable campaign with honest finite difficulty and validated solvability, not a decorative prototype or lab controls with pretend game results.
 - Pure rules and UI remain separate. Test normal/negative/boundary/replay/undo/lifecycle cases, then actual browser input at desktop/390/320 with no document overflow/console failures.
 - Document exact mechanics, witnesses, bounds, test types, local browser evidence and any NOT_RUN. A human difficulty/fun rating cannot be asserted from model tests alone.
-- Original code and code-native art; no external content/license dependence. No global rankings/server/cloud persistence; reuse static Pages.
+- Original code and code-native art; no external content/license dependence. Reuse static Pages. The approved ranking exception below supersedes the initial no-server restriction.
+
+## Approved opt-in public ranking exception (2026-10-09)
+
+Only the fixed final challenge may connect to the separate web-lab-ranking API. Ordinary practice remains offline. Users explicitly start a fresh challenge and explicitly register a completed result; no automatic requests on load. The server replays bounded accepted commands using identical versioned rules, rejects client outcome fields, and ranks equal outcomes equally without device speed. Store only an anonymous credential locally; server stores nickname, verified best and private verification commands. Delete removes both eligible games' public records for that anonymous identity; inactive identities expire after 180 days. No paid plan, real-name account, analytics, IP storage or fabricated participants. CSP permits only the exact deployed ranking origin. Human-only play and one identity per human are not guaranteed.

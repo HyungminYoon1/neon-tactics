@@ -11,6 +11,9 @@ function cube(ctx,p,w,h,depth,top,left,right){
 }
 function hp(ctx,p,actor,color){ctx.fillStyle="#111425";ctx.fillRect(p.x-15,p.y-47,30,5);ctx.fillStyle=color;ctx.fillRect(p.x-15,p.y-47,30*actor.hp/actor.maxHp,5);}
 function robot(ctx,p,actor,ghost=false){
+ if(actor.group==="convoy"){
+  ctx.save();ctx.globalAlpha=ghost?.5:1;cube(ctx,p,23,13,21,"#e7d494","#8d7649","#584c39");ctx.fillStyle="#29293b";ctx.fillRect(p.x-15,p.y-19,30,6);ctx.fillStyle="#ffe5a0";ctx.font="bold 11px monospace";ctx.textAlign="center";ctx.fillText("V",p.x,p.y+27);if(!ghost)hp(ctx,p,actor,"#e9d49a");ctx.restore();return;
+ }
  const enemy=actor.group==="enemy",color=enemy?"#ff8794":colors[actor.id];ctx.save();ctx.globalAlpha=ghost?.5:1;
  ctx.fillStyle="#02071980";ctx.beginPath();ctx.ellipse(p.x+4,p.y+9,23,10,0,0,Math.PI*2);ctx.fill();ctx.shadowBlur=ghost?15:8;ctx.shadowColor=color;
  if(enemy){
@@ -40,6 +43,9 @@ export function paint(ctx,{state,selected,mode,cursor,preview,plan,events=[],eff
  // Raised foundation and wet pavement reflect the two real squad/hostile colors.
  const a=iso(0,7),b=iso(7,7),c=iso(7,0);ctx.fillStyle="#181c30";ctx.beginPath();ctx.moveTo(a.x-46,a.y);ctx.lineTo(b.x,b.y+26);ctx.lineTo(b.x,b.y+42);ctx.lineTo(a.x-46,a.y+16);ctx.closePath();ctx.fill();ctx.fillStyle="#111b2c";ctx.beginPath();ctx.moveTo(b.x,b.y+26);ctx.lineTo(c.x+46,c.y);ctx.lineTo(c.x+46,c.y+16);ctx.lineTo(b.x,b.y+42);ctx.closePath();ctx.fill();
  const shows=preview?.valid?preview.state:state;
+ const objective=level.objective;
+ const markers=objective?.route??objective?.exits??objective?.pads??[];
+ for(let i=0;i<markers.length;i++){const tile=markers[i],p=iso(tile.x,tile.y);ctx.strokeStyle="#e9d49a";ctx.lineWidth=3;diamond(ctx,p,37,20);ctx.stroke();ctx.fillStyle="#ffe5a0";ctx.font="bold 10px monospace";ctx.textAlign="center";ctx.fillText(objective.type==="escort"?(i===markers.length-1?"EXIT":"V"+i):objective.type==="escape"?"EXIT":tile.unitId??"HOLD",p.x,p.y+17);}
  if(mode==="move")for(const tile of moveCells(state,selected)){const p=iso(tile.x,tile.y);ctx.fillStyle="#77ecd01d";diamond(ctx,p,41,23);ctx.fill();ctx.strokeStyle="#79f6d477";ctx.stroke();}
  const plans=plan?.plans??[];for(let i=0;i<plans.length;i++)for(const tile of plans[i].cells){const p=iso(tile.x,tile.y);ctx.fillStyle="#fa777c16";diamond(ctx,p,40,22);ctx.fill();ctx.strokeStyle="#e784985a";ctx.setLineDash([4,4]);ctx.stroke();ctx.setLineDash([]);}
  for(const wave of level.waves.filter(w=>w.turn===state.turn+1))for(const e of wave.enemies){const p=iso(e.x,e.y);ctx.strokeStyle="#e9d49a66";ctx.lineWidth=2;ctx.setLineDash([3,6]);diamond(ctx,p,30,17);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle="#e9d49a";ctx.font="8px monospace";ctx.textAlign="center";ctx.fillText("IN",p.x,p.y+3);}
@@ -60,7 +66,7 @@ export function paint(ctx,{state,selected,mode,cursor,preview,plan,events=[],eff
  }
  if(cursor&&state.status==="playing"){const p=iso(cursor.x,cursor.y);ctx.strokeStyle=preview?.valid?mode==="skill"?"#f088c6":"#79f6d4":"#a6a1b8";ctx.lineWidth=2;diamond(ctx,p,43,24);ctx.stroke();ctx.fillStyle=ctx.strokeStyle;ctx.font="9px monospace";ctx.textAlign="center";ctx.fillText((cursor.x+1)+"/"+(cursor.y+1),p.x,p.y+5);}
  if(effect>0){ctx.save();ctx.globalAlpha=effect;for(const event of events){if(event.kind!=="hit"&&event.kind!=="death"&&event.kind!=="explosion")continue;const p=iso(event.x,event.y);ctx.strokeStyle=event.kind==="explosion"?"#ef9cca":"#f4d8a5";ctx.lineWidth=3;for(let k=0;k<8;k++){const angle=k*Math.PI/4,r=25+(1-effect)*20;ctx.beginPath();ctx.moveTo(p.x+Math.cos(angle)*r,p.y-15+Math.sin(angle)*r*.6);ctx.lineTo(p.x+Math.cos(angle)*(r+13),p.y-15+Math.sin(angle)*(r+13)*.6);ctx.stroke();}if(event.kind==="hit"){ctx.fillStyle="#fff1cb";ctx.font="bold 18px monospace";ctx.textAlign="center";ctx.fillText("−"+event.amount,p.x,p.y-62);}}ctx.restore();}
- ctx.textAlign="left";ctx.fillStyle="#a999b8";ctx.font="11px monospace";ctx.fillText("SECTOR "+String(state.levelId).padStart(2,"0")+" / "+level.grade+"   ·   COMMAND WINDOW",35,41);ctx.textAlign="right";ctx.fillStyle="#8fb4b8";ctx.fillText("WET ZONE // 22:47",1065,41);
+ ctx.textAlign="left";ctx.fillStyle="#a999b8";ctx.font="11px monospace";ctx.fillText("SECTOR "+String(state.levelId).padStart(2,"0")+" / "+level.grade,35,41);
  ctx.fillStyle="#85799388";ctx.font="9px monospace";ctx.textAlign="center";for(let x=0;x<8;x++){const p=iso(x,8);ctx.fillText(x+1,p.x,p.y+28);}
- ctx.textAlign="left";ctx.fillText("READ. REPOSITION. RESOLVE.",35,575);ctx.textAlign="right";ctx.fillStyle="#92bead";ctx.fillText("3 UNITS / 3 COMMANDS",1065,575);
+ ctx.textAlign="right";ctx.fillStyle="#92bead";ctx.fillText("3 UNITS / 3 COMMANDS",1065,575);
 }

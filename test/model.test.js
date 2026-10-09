@@ -19,8 +19,8 @@ for(const w of witnesses)test("mission "+w.id+" actual command witness protects 
  assert.equal(JSON.stringify(createRun(w.id)),initial);assert.equal(endTurn(s).valid,false);
 });
 test("campaign has 12 finite missions, six advanced combinations, 3 distinct unit abilities",()=>{
- assert.equal(levels.length,12);assert.equal(HISTORY_LIMIT,32);for(const l of levels){assert.equal(new Set(l.units.map(u=>u.role)).size,3);assert.ok(l.waves.reduce((n,w)=>n+w.enemies.length,0)+l.units.length+l.buildings.length<=MAX_ENTITIES);assert.ok(l.maxTurns<=6);assert.ok(l.minCityHp<=12);}
- assert.ok(levels.slice(6).every(l=>l.grade==="MASTER"&&l.minCityHp===10&&l.waves.length===3));assert.ok(levels.some(l=>l.waves.flatMap(w=>w.enemies).some(e=>e.kind==="blast")));assert.equal(new Set(levels.map(l=>l.waves[0].enemies[0].dir)).size,4);
+ assert.equal(levels.filter(l=>l.campaign===1).length,12);assert.equal(levels.length,16);assert.equal(HISTORY_LIMIT,32);for(const l of levels){assert.equal(new Set(l.units.map(u=>u.role)).size,3);assert.ok(l.waves.reduce((n,w)=>n+w.enemies.length,0)+l.units.length+l.buildings.length+(l.objective?.type==="escort"?1:0)<=MAX_ENTITIES);assert.ok(l.maxTurns<=6);assert.ok(l.minCityHp<=12);}
+ assert.ok(levels.slice(6,12).every(l=>l.grade==="MASTER"&&l.minCityHp===10&&l.waves.length===3));assert.ok(levels.some(l=>l.waves.flatMap(w=>w.enemies).some(e=>e.kind==="blast")));assert.equal(new Set(levels.map(l=>l.waves[0].enemies[0].dir)).size,4);
 });
 test("invalid/blocked/range/unknown commands preserve AP, actors and state",()=>{
  const s=createRun(1),snapshot=JSON.stringify(s);for(const c of [{type:"__proto__",unitId:"R",x:3,y:4},{type:"skill",unitId:"?",x:3,y:4},{type:"move",unitId:"R",x:-1,y:3},{type:"move",unitId:"R",x:3,y:2},{type:"skill",unitId:"R",x:1,y:1},{type:"skill",unitId:"S",x:3,y:7}]){

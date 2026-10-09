@@ -1,5 +1,50 @@
 # Decisions
 
+## D10 — Dismiss completed result without resetting the run
+
+- Context: actual 320/390px browser testing found the fixed completion panel blocking public-record controls.
+- Options: reset the completed run; remove the result panel; provide a separate close action.
+- Decision: add a keyboard-accessible result-close button. Closing only hides the panel and focuses the board; score, completed state and captured actions remain unchanged. A new attempt resets dismissal.
+- Rationale: completion should not prevent opt-in registration or deleting an existing public record on small screens.
+- Affected: dist/index.html, dist/src/app.js.
+- Review: replay the legal final solution, close at mobile widths, submit and delete the actual test record; no result/score injection.
+
+## D09 — Explicit free public ranking integration (supersedes no-network clauses)
+
+- Context: user approved a free ranking server, then restricted it to extremely hard, equal-condition games. This app's fixed final challenge is selected; no other levels submit.
+- Options: publish client scores; database-only browser access; bounded server replay in a separate API.
+- Decision: opt-in start/submit/view/delete UI in ranking-client.js; exact Cloudflare Worker origin in CSP; anonymous 256-bit bearer credential in web-lab-ranking-identity-v1. Reuse fixed ranked rules and action limits. Only verified bests are public; ties do not depend on arrival time or device speed. Final rules require a version bump if changed. Ordinary play remains offline; loading a page makes no ranking request. API stores nickname, opaque identity and private verification commands, expires after 180 inactive days, and deletes the identity's records in both ranked games on authenticated request. Cloudflare Workers Free plus SQLite Durable Object, bounded fail-closed quotas, no paid upgrade or other provider resource.
+- Rationale: same authored opportunity and deterministic scoring; no invented ranks or direct database credentials in Pages. This does not prove human-only play, distinct humans or measured human difficulty.
+- Affected: dist/src/ranking-client.js, dist/ranking.css, dist/index.html, app.js, tools/check.mjs, architecture/requirements/README; separate web-lab-ranking service.
+- Review: main tests actual UI opt-in, legal input capture, server submission/query/delete, denied requests, reload, mobile layout, live API and published rules consistency. No automatic posting, real names, emails, analytics or IP storage.
+
+## D05 — Approved bounded local replay persistence
+
+- Context: User explicitly authorized autosave, restore/clear and independent progress. This supersedes D02/D04's memory-only boundary for the fields below.
+- Options: trust serialized state/score; store unbounded history; replay a bounded validated command log.
+- Decision: one neon-tactics-save-v2 key, schema 2 and rules neon-2.0.0. At most 128 KiB UTF-8, one current run and two best replays per each of 16 missions. Each replay permits 128 accepted action/end/undo/hint events; command coordinates 0–7, units R/H/S. Undo keeps 32 snapshots. Rehydrate via model; reject malformed, stale or illegal replay atomically. Retain best independent and assisted results separately; hints and tutorial mark assisted permanently across undo. Failure/quota/disabled storage falls back to memory with a visible status. Restore never runs a command automatically. Clear removes this game's key and own gallery entry only. No names, wall-clock scoring, telemetry or network.
+- Rationale: reproducible recovery without trusting saved scores; finite storage/CPU. Clearing persists until a new explicit game starts.
+- Affected: replay.js, storage.js, app.js, tests, architecture/README/check.
+- Review: main verifies reload, storage denial, multi-tab, clear and browser controls. No claim of server integrity. Ranked attempts use separate memory-only capture and do not overwrite practice saves/bests/summary. This narrows current-run autosave to practice/tutorial; a refreshed ranked attempt must start fresh.
+
+## D06 — Additional objectives and fixed-condition master
+
+- Context: preserve city defense while introducing positional goals and a fair ranking candidate.
+- Options: replace old campaign; inflate enemy HP; append objective-specific missions.
+- Decision: preserve v1 IDs 1–12, append v2 IDs 13–16. Escort: adjacent living unit advances the vulnerable convoy one authored route tile after enemy fire, if empty. Escape: move each living unit onto an exit; exited units leave occupancy/targeting. Hold: occupy both beacons for consecutive resolved enemy turns; lost occupancy resets streak. Master: original mission 12 geometry/waves plus 12/12 city power, all units alive, 10 total skills, four consecutive enemy turns holding the R beacon, and five-turn deadline. Score uses turns/actions/damage/kills only. Preview exposes full end-turn state including objective/spawn/failure.
+- Rationale: different legal positional solutions and loss conditions without speed or hidden score injection.
+- Affected: levels/model/render/app, objective witnesses/tests.
+- Review: legal witnesses and negatives required; difficulty is an authored candidate, not a measured human rating. The approved ranked.js contract is implemented: 20 actual move/skill/endTurn actions maximum, rules neon-2.0.0, challenge neon-master-16-v2. app.js exports rankingAdapter start/getActions/isComplete/getDefinition; the visible #start-ranked starts the same flow. No SDK or transport is connected. Equal scores use ascending turns, commands, city HP loss, unit HP loss. Unlimited retries use identical fresh state; ranked undo/hints are rejected. Payloads contain no state/score/timestamp, with strict primitive fields making even 20 commands smaller than 2 KiB. Main owns Worker timing/provider validation and explicit opt-in submission/view.
+
+## D07 — Minimal gallery summary
+
+- Context: approved cross-app contract web-lab-progress-v1.
+- Options: share private runs; minimal counts; no gallery badge.
+- Decision: progress.js validates at most 15 known app IDs from the local service inventory and 8 KiB JSON. Entries contain only completed/total integers (0 <= completed <= total <= 1000) and a real ISO updatedAt. Recompute this app's count from replay-validated durable independent wins after successful save, never visits/tutorial/hints. Preserve valid other app entries; clear removes only neon-tactics. Do not touch sibling repositories.
+- Rationale: gallery reads achievements without accessing run payloads; timestamp is local update metadata only.
+- Affected: progress.js, storage.js, tests, architecture/README/check.
+- Review: main checks the shared allowlist against its canonical 15 IDs. Malformed/oversized aggregates fail safely.
+
 ## D03 — 유한 게임 규칙과 재현 가능한 캠페인
 
 - Context: 높은 난도와 실제 실패/성공이 있는 게임이며 무작위 데이터가 불가능한 문제를 만들면 안 됩니다.

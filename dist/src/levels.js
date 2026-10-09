@@ -2178,5 +2178,13 @@ const data=[
   "hint": "BREAKER는 벽 충돌로 큰 피해를 주고, ANCHOR는 물로 끌어 즉시 제거할 수 있습니다. PHASE로 공격선을 옮긴 뒤 턴 종료 미리보기에서 적의 아군 오사를 확인하세요."
  }
 ];
-export const levels=Object.freeze(data.map(level=>Object.freeze(level)));
+const extra=(base,id,name,objective,overrides={})=>({...structuredClone(data[base-1]),id,name,chapter:5,grade:"TACTICAL",objective,...overrides});
+data.push(
+ extra(1,13,"호송로",{type:"escort",route:[{x:2,y:6},{x:2,y:5},{x:2,y:4},{x:2,y:3}]},{maxTurns:6,brief:"수송차 V를 출구까지 호송. 적 턴 뒤 인접 기체가 있으면 빈 다음 칸으로 전진합니다. 전력 ≥ 6.",hint:"공격선을 먼저 없애고 수송차 옆을 따라가세요."}),
+ extra(1,14,"동쪽 탈출",{type:"escape",exits:[{x:7,y:2},{x:7,y:3},{x:7,y:4}]},{maxTurns:6,brief:"6턴 안에 세 기체를 동쪽 EXIT로 이동. 기체 손실 시 실패. 전력 ≥ 6.",hint:"적을 제거한 뒤 두 칸 이동과 아군 교환으로 출구까지 이동하세요."}),
+ extra(1,15,"연결 유지",{type:"hold",pads:[{x:3,y:5},{x:1,y:4}],turns:3},{maxTurns:4,minCityHp:12,brief:"두 거점을 동시에 지키며 적 턴 3회 연속 유지. 시설 무손실. 이탈하면 유지 횟수가 초기화됩니다.",hint:"BREAKER와 ANCHOR를 거점에 남기고 공격선을 정리하세요."}),
+ extra(12,16,"최종 방어선",{type:"master",pads:[{x:5,y:4,unitId:"R"}],turns:4},{grade:"MASTER",maxTurns:5,minCityHp:12,skillLimit:10,allAlive:true,rankedCandidate:true,brief:"5턴 안에 전멸 · 시설 무손실 · 전원 생존 · 기술 10회 이하 · R 거점 적 턴 4회 연속 유지.",hint:"PHASE로 공격 순서를 바꾸고 ANCHOR로 후반 폭탄을 처리하세요. R은 거점을 지킵니다."})
+);
+export const RULES_VERSION="neon-2.0.0";
+export const levels=Object.freeze(data.map(level=>Object.freeze({...level,campaign:level.id<=12?1:2})));
 export function getLevel(id){const level=levels.find(l=>l.id===id);if(!level)throw new RangeError("Unknown mission");return level;}
