@@ -1,5 +1,14 @@
 # Decisions
 
+## D11 — 결과 복원과 목표별 전술 과제 (2026-10-13)
+
+- Context: 완료 결과를 닫고 저장을 복원하면 이전 화면의 닫힘 상태가 남아 결과가 숨겨졌다. 새로운 명령으로 다시 완료해도 같은 문제가 생길 수 있었다.
+- Options: 결과 닫기 제거; 닫힘 값을 영구 저장; 복원 및 성공한 실제 명령에서 UI 닫힘 값 초기화.
+- Decision: restore/adopt에서 resultDismissed를 초기화한다. 호송·전원 탈출·연속 점유의 관찰 과제를 추가하며 버튼은 기존 13–15번 독립 연습을 시작한다.
+- Rationale: 닫기는 현재 화면에만 적용하고 복원된 종료 상태는 다시 읽을 수 있어야 한다. 공격 순서·공유 명령·목표 진행을 서로 연결해 연습하게 한다.
+- Affected: dist/src/app.js, dist/index.html, styles.css, tools/ui-regression.cjs, docs/provenance.md.
+- Review: neon-2.0.0/neon-master-16-v2, 16번 배치·점수·20명령·랭킹 캡처·저장 형식은 변경하지 않는다. 버튼이 현재 진행을 새 연습으로 교체한다고 화면에서 알린다. 공개 API 쓰기는 수행하지 않는다.
+
 ## D10 — Dismiss completed result without resetting the run
 
 - Context: actual 320/390px browser testing found the fixed completion panel blocking public-record controls.

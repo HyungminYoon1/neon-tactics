@@ -1,5 +1,17 @@
 # Verification record
 
+## 2026-10-13 — 완료 결과 복원·전술 과제 / LOCAL
+
+- UI 변경: YES. 결과 닫힘은 현재 화면에만 적용하며 복원/새 실제 명령에서 초기화. 호송/탈출/연속 점유 과제 버튼과 설명 추가. 모바일 과제는 게임 조작 뒤에 둔다. 규칙·점수·16번 랭킹 배치/버전/캡처 변경 없음.
+- BUG BEFORE: 실제 입문5900점 완료→결과 닫기→저장 복원 뒤 result-overlay.isVisible 검사가 실패했다. 수정 후 같은 입력 통과. tools/ui-regression.cjs는 loopback 페이지를 먼저 연 뒤 Playwright CLI run-code --filename으로 재실행한다.
+- LOCAL: npm test 44/44 PASS, fail/skipped0 (1309.754ms); 기존12 임무·13–16 목표 해답/실패/예상 일치·랭킹/저장/상한 시험 유지. npm run check PASS(14 public files), git diff --check PASS. 문구 복제 시험은 추가하지 않았다.
+- BROWSER: 격리 Playwright 세션, loopback, 1440×1000/390×900/320×900. 13번 호송1/3 실제 진행 캡처 후 완료·완료 저장 복원. 390px 목표 패드/확인 버튼으로 14번 전원 탈출3/3 완료. 320px 15번 거점1/3→R 이탈→적 턴에서0/3→두 번 취소→재유지3/3 완료. 별도16 기록 규칙 선택의 힌트/취소 잠금 확인. 관측한 document overflow/pageerror/원격 요청0.
+- 캡처: ignored output/qa-20261013/desktop.png(호송1/3·새 과제), mobile-390.png(전원 탈출 완료), mobile-320.png(점유3/3·보드 뒤 새 과제). 변경 후 실제 이미지를 열어 배치를 확인했다.
+- 선택자: .practice-notes summary, [data-practice-level], #restore, #result-close, #objective, [data-unit], [data-cursor], #touch-confirm, #start-ranked.
+- 변경 파일: dist/index.html/styles.css, dist/src/app.js, tools/ui-regression.cjs, README.md, docs/decisions.md/verification.md/provenance.md.
+- 소스 범위: 저장소 PARTIAL(전체 목록 후 관련 선택). architecture/requirements/README/decisions VERIFIED; api-spec/AGENTS 없음. 변경 UI/관련 CSS, 모델·replay/ranking 경계·목표 시험·witness 검토. 변경 없는 아트/배포 workflow/전체 CSS의 새 전수 심사는 제외.
+- NOT_RUN: 물리 터치·다른 브라우저·보조기술, 나머지 캠페인의 개별 브라우저 완주, 새 저장 거부/다중탭 UI, 서버 실제 API/공개 점수 제출, 사람의 난도 평가, 원격 CI/LIVE. 커밋/푸시/배포/갤러리 편집/다른 에이전트0. 설명 근거: provenance.md.
+
 ## 2026-10-09 — current improvements and optional public records
 
 - LOCAL: 44 Node tests and source checks PASS. Practice saves/independent records and versioned final replay are separate from the public API.

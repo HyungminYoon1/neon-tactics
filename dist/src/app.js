@@ -65,7 +65,7 @@ function saveCurrent(){
 function adopt(command){
  if(!started)return;
  try{const out=replay.mode==="ranked"?capture.record(command):appendInput(replay,command);stopEffects();state=out.state;replay=out.replay;hinted=out.assisted;past=out.history;events=out.events;aiming=false;preview=null;if(!state.units.some(u=>u.id===selected&&active(u)))selected=state.units.find(active)?.id??"R";
-  if(state.status==="won"&&replay.mode==="ranked")capture.finish();saveCurrent();update();status(state.status!=="playing"?state.reason:command.type==="undo"?"되돌림":"명령 실행");animateHits();
+  resultDismissed=false;if(state.status==="won"&&replay.mode==="ranked")capture.finish();saveCurrent();update();status(state.status!=="playing"?state.reason:command.type==="undo"?"되돌림":"명령 실행");animateHits();
  }catch{status(replay.inputs.length>=MAX_INPUTS?"입력 한도입니다. 새로 시작하세요.":"실행할 수 없는 명령입니다.");}
 }
 function confirm(){if(preview?.valid)adopt({type:mode,unitId:selected,x:cursor.x,y:cursor.y});else status(preview?.reason??"목표 선택");}
@@ -106,6 +106,7 @@ function tutorial(){
  text("tutorial-step",state.status==="won"?"입문 완료 · 임무에서 독립 기록을 시작하세요.":state.status==="failed"?"다시 시작해 공격선을 바꿔 보세요.":living("E1")?"1/3 · R → 기술 → 4열 5행 E1 → 확인. 벽 충돌 피해를 확인하세요.":living("E2")?"2/3 · H → 기술 → 2열 2행 E2 → 확인. 물로 끌어당깁니다.":"3/3 · S → 기술 → 7열 4행 E3 → 확인. 교환하며 피해 1을 줍니다.");
 }
 function restore(){
+ resultDismissed=false;
  loaded=loadSave(storage);if(!loaded.save.current){status("복원할 저장이 없습니다.");return;}save=loaded.save;stopEffects();replay=structuredClone(save.current);
  // A restored ranked run is local practice; future server start tokens are never restored.
  if(replay.mode==="ranked")replay.mode="practice";const out=replayRun(replay);state=out.state;hinted=out.assisted;past=out.history;events=[];capture=null;started=true;selected=state.units.find(active)?.id??"R";cursor={...state.units.find(u=>u.id===selected)};mode="move";aiming=false;board.dataset.mode=replay.mode;$("hint-copy").hidden=true;for(const d of document.querySelectorAll("dialog[open]"))d.close();update();text("save-status","저장 복원됨");status("저장한 명령까지 복원했습니다.");board.focus({preventScroll:true});
@@ -113,6 +114,7 @@ function restore(){
 function setZoom(value){zoom=Math.max(1,Math.min(2.5,value));const container=document.querySelector(".board-scroll");document.querySelector(".board-stage").style.width=Math.floor(container.clientWidth*zoom)+"px";text("zoom-label",Math.round(zoom*100)+"%");$("zoom-out").disabled=zoom===1;$("zoom-in").disabled=zoom===2.5;if(zoom===1){container.scrollLeft=0;container.scrollTop=0;}else scrollCursor();}
 for(const id of ["welcome-tutorial","start-tutorial"])$(id).addEventListener("click",()=>choose(1,"tutorial"));
 $("welcome-master").addEventListener("click",()=>choose(16));$("start-ranked").addEventListener("click",()=>rankingAdapter.start());
+for(const button of document.querySelectorAll("[data-practice-level]"))button.addEventListener("click",()=>choose(Number(button.dataset.practiceLevel)));
 for(const id of ["welcome-restore","restore"])$(id).addEventListener("click",restore);
 $("clear-records").addEventListener("click",()=>showDialog("clear-dialog"));
 $("confirm-clear").addEventListener("click",()=>{const result=clearSave(storage);save=emptySave();started=false;replay=null;capture=null;state=createRun(1);past=[];events=[];hinted=false;aiming=false;selected="R";cursor={...state.units[0]};$("hint-copy").hidden=true;$("restore").disabled=true;$("welcome-restore").hidden=true;text("save-status",result.ok?(result.summaryOk?"기록 삭제됨":"기록 삭제됨 · 갤러리 삭제 실패"):"기기 기록을 삭제하지 못했습니다.");$("clear-dialog").close();update();showDialog("welcome-dialog");});

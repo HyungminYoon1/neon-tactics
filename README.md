@@ -1,5 +1,7 @@
 # NEON TACTICS — 내일의 공격
 
+2026-10-13 로컬 개선: 호송·전원 탈출·연속 점유 과제를 추가했습니다. 닫았던 완료 결과도 저장 복원 시 다시 표시합니다. [검증과 한계](docs/verification.md) · [과제 근거](docs/provenance.md).
+
 세 기체의 이동·밀치기·끌기·교환으로 적의 공격선을 바꾸는 턴제 전술 게임입니다.
 
 [게임](https://hyungminyoon1.github.io/neon-tactics/) · [WEB LAB](https://hyungminyoon1.github.io/web-lab/) · [소스](https://github.com/HyungminYoon1/neon-tactics)
