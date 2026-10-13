@@ -1,5 +1,9 @@
 # Verification record
 
+## 2026-10-13 — systematic edge-case audit / LOCAL
+
+[경계 매트릭스·신규 테스트·실패 전후·명령·소스 및 미검증 범위](edge-cases-20261013.md). 기존44 + 신규6 = npm test 50/50 PASS; npm run check / git diff --check PASS. 신규5개 baseline PASS는 coverage추가이며 readback1개와 IME·삭제거부 browser회귀만 RED_GREEN. 격리 actualChrome primary/negative flows 및1440/390/320입력·캡처 PASS. Browserharness 현CI미실행/remoteCI·LIVE NOT_RUN. 공용rankingclient/rules보존.
+
 ## 2026-10-13 — 완료 결과 복원·전술 과제 / LOCAL
 
 - UI 변경: YES. 결과 닫힘은 현재 화면에만 적용하며 복원/새 실제 명령에서 초기화. 호송/탈출/연속 점유 과제 버튼과 설명 추가. 모바일 과제는 게임 조작 뒤에 둔다. 규칙·점수·16번 랭킹 배치/버전/캡처 변경 없음.

@@ -26,6 +26,7 @@ export function browserStorage(){try{return globalThis.localStorage;}catch{retur
 export function loadSave(storage){try{const raw=storage?.getItem(SAVE_KEY);return {save:raw==null?emptySave():decodeSave(raw),ok:!!storage,exists:raw!=null};}catch{return {save:emptySave(),ok:false,exists:false};}}
 export function persistSave(storage,save){
  try{const clean=validateSave(save),raw=JSON.stringify(clean);if(new TextEncoder().encode(raw).length>MAX_SAVE_BYTES)throw new Error("Save bounds");storage.setItem(SAVE_KEY,raw);
+  if(storage.getItem(SAVE_KEY)!==raw)return {ok:false,summaryOk:false};
   const count=independentCount(clean);return {ok:true,summaryOk:count?writeProgress(storage,count,levels.length):true};
  }catch{return {ok:false,summaryOk:false};}
 }
